@@ -21,9 +21,9 @@ fields = [
         },
         {
             'field_name': 'Type',
-            'etsy_field': '',
+            'etsy_field': None,
             'default': 'Inventory',
-            'valid': ('Inventory', 'Noninventory', 'Service')
+            'valid': ('Inventory', 'Noninventory', 'Service'),
             'valid': ()
         },
         {

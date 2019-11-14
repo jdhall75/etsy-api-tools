@@ -28,7 +28,7 @@ class Listing:
         # make the request
         resp = requests.get(self.request_url, self.params)
 
-# reset the array_index everytime _get_listings is called
+        # reset the array_index everytime _get_listings is called
         self.array_index = 0
         
         if(resp):
