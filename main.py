@@ -1,16 +1,11 @@
 from requests_oauthlib import OAuth1Session
-import json
 from etsyapi.extras.output import ExcelWriter
 import csv
-from pprint import pprint
-
-from sys import exit
 
 from etsyapi.api import Api
 
 # import local config
 from config import Config as conf
-
 
 def main():
     config = conf()

@@ -1,5 +1,6 @@
 config.py
-reports
+reports/*.xls*
+reports/*.csv
 __pycache__
 venv
 .idea
