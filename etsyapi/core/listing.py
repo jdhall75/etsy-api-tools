@@ -29,5 +29,6 @@ class ListingInventory:
     def listing_inventory(self, listing_id):
         url = "/listings/{}/inventory".format(listing_id)
         resp = self.oauth_client.get(self.api_url + url)
-
-        return resp.json()
+        inv_dict = resp.json()
+        data = [product for product in inv_dict['results']['products']]
+        return data

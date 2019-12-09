@@ -34,7 +34,6 @@ class PaginatedQuery:
             data = json.loads(resp.content)
             self.results = iter([result for result in data['results']])
 
-
             self.params['offset'] = data['pagination']['next_offset']
             self.results_total = data['count']
             self.limit = data['params']['limit']
