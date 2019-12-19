@@ -16,10 +16,12 @@ def set_timestamp(epoch, filename="runtime"):
 
 
 def get_timestamp(filename="runtime"):
-    with open(filename, "r+") as f:
-        ts = f.read()
-    return ts
-
+    try:
+        with open(filename, "r+") as f:
+            ts = f.read()
+        return float(ts)
+    except IOError:
+        return False
 
 def main():
     config = Config()
@@ -33,7 +35,7 @@ def main():
 
     etsy = Api(config.etsy_api_url, oauth_client=oauth_client)
 
-    last_run = time.mktime(time.strptime('11/25/2019 21:30:00', "%m/%d/%Y %H:%M:%S"))
+    last_run = get_timestamp()
 
     now = time.time()
     set_timestamp(now)
@@ -70,12 +72,13 @@ def main():
         row += 1
 
     if len(unsure_names) > 0:
-        with open("reports/unsure_names.csv", "w+") as csv_out:
+        with open("reports/unsure_names.csv", "a+") as csv_out:
             csv_writer = csv.writer(csv_out)
             for unsure_name in unsure_names:
                 csv_writer.writerow([unsure_name['name'], unsure_name['buyer_email']])
 
     print("Exported {} receipts from Etsy".format(row))
+
 
 if __name__ == "__main__":
     main()
