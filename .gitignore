@@ -1,2 +1,7 @@
 config.py
+reports/*.xls*
+reports/*.csv
 __pycache__
+venv
+.idea
+*.json
