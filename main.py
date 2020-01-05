@@ -4,10 +4,14 @@ from woocommerce import API
 import urllib
 import time
 
+from pprint import pprint
+
 from etsyapi.api import Api
 
 # import local config
 from config import Config as conf
+
+import datetime
 
 
 def main():
@@ -33,12 +37,19 @@ def main():
     params = {"per_page": 50}
 
     def get_product_variations(product_id=0):
-        interesting_data = ["id", "status", "sku", "description", "manage_stock", "product_id"]
+        interesting_data = [
+            "id",
+            "status",
+            "sku",
+            "description",
+            "manage_stock",
+            "product_id",
+        ]
         return_variations = []
         vari = {}
         url = f"products/{product_id}/variations"
         local_variations = wcapi.get(url).json()
-        print(local_variations)
+        # print(local_variations)
         # filter all the data we dont care about
         for v in local_variations:
             for key in v.keys():
@@ -90,7 +101,7 @@ def main():
             for meta in p["meta_data"]:
                 if meta["key"] == "_etsy_id":
                     prod["etsy_id"] = meta["value"]
-            print(prod)
+            # print(prod)
             woo_products.append(prod.copy())
 
         # if there is a next url then adjust the params and call for
@@ -109,13 +120,15 @@ def main():
     inv_count = 0
     count = 0
 
-    writer = ExcelWriter.ExcelWriter("reports/etsy_stock.xlsx")
+    filename = f"etsy_stock-{datetime.date.today()}.xlsx"
+    writer = ExcelWriter.ExcelWriter(f"reports/{filename}")
 
     writer.add_sheet(sheet_name="etsy_listings")
     writer.add_sheet(sheet_name="etsy_listing_product")
     writer.add_sheet(sheet_name="woo_products")
     writer.add_sheet(sheet_name="woo_variations")
 
+    # start processing woocommerce listings
     prod_count = 0
     for prod in woo_products:
         if prod_count == 0:
@@ -124,7 +137,7 @@ def main():
             prod_count += 1
         if prod is not None:
             variations = prod["variations"]
-            del(prod["variations"])
+            del prod["variations"]
             writer.write_row(prod, sheet_name="woo_products")
 
             v_counter = 0
@@ -135,6 +148,7 @@ def main():
                 writer.write_row(v, sheet_name="woo_variations")
                 v_counter += 1
 
+    # processing for etsy listings
     for listing in listings:
         if count == 0:
             # writer the headers with the keys
@@ -144,28 +158,42 @@ def main():
             count += 1
         if listing is not None:
             # if list['has_variations']:
-
             listing_inv = etsy.listing_inventory.listing_inventory(
                 listing["listing_id"]
             )
 
             for li in listing_inv:
-                del li["offerings"]
-                del li["property_values"]
+                if li["is_deleted"] == 1:
+                    continue
+                prod = {
+                    "sku": li["sku"],
+                    "listing_id": listing["listing_id"],
+                    "product_id": li["product_id"],
+                    "title": listing["title"],
+                }
+
+                if len(li["offerings"]) == 1:
+                    prod["price"] = li["offerings"][0]["price"][
+                        "currency_formatted_short"
+                    ]
+                    prod["quantity"] = li["offerings"][0]["quantity"]
+                else:
+                    pprint(li)
+
                 li["listing_id"] = listing["listing_id"]
                 if inv_count == 0:
                     writer.write_headers(
-                        list(li.keys()), sheet_name="etsy_listing_product"
+                        list(prod.keys()), sheet_name="etsy_listing_product"
                     )
                     inv_count += 1
-                writer.write_row(li, sheet_name="etsy_listing_product")
+                writer.write_row(prod, sheet_name="etsy_listing_product")
                 inv_count += 1
                 time.sleep(0.1)
 
             writer.write_row(listing, sheet_name="etsy_listings")
             count += 1
 
-    print(f"Wrote {count} lines to reports/etsy_stock.xlsx")
+    print(f"Wrote {count} lines to reports/{filename}")
 
 
 if __name__ == "__main__":
