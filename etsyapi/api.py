@@ -1,5 +1,6 @@
 from etsyapi.core import listing
 from etsyapi.core import receipt
+from etsyapi.core import transaction
 
 
 class Api(object):
@@ -19,3 +20,4 @@ class Api(object):
         self.shop_listings = listing.ShopListings(self)
         self.listing_inventory = listing.ListingInventory(self)
         self.receipts = receipt.Receipt(self)
+        self.transactions = transaction.Transaction(self)

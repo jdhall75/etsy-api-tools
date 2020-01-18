@@ -7,7 +7,7 @@ client_token = myConfig.client_token
 client_secret = myConfig.client_secret
 
 token_request_url = myConfig.etsy_api_url + "/v2/oauth/request_token?email_r"
-token_access_url =  myConfig.etsy_api_url + 'v2/oauth/access_token'
+token_access_url =  myConfig.etsy_api_url + '/v2/oauth/access_token'
 
 oauth = OAuth1Session(client_token, client_secret=client_secret)
 

@@ -11,17 +11,18 @@ from etsyapi.api import Api
 
 
 def set_timestamp(epoch, filename="runtime"):
-    with open(filename, "w+") as f:
+    with open(f"cache/{filename}", "w+") as f:
         f.write(str(epoch))
 
 
 def get_timestamp(filename="runtime"):
     try:
-        with open(filename, "r+") as f:
+        with open(f"cache/{filename}", "r+") as f:
             ts = f.read()
         return float(ts)
     except IOError:
         return False
+
 
 def main():
     config = Config()

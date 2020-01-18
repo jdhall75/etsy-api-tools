@@ -170,7 +170,7 @@ def etsy_report(config):
                 listing["listing_id"]
             )
 
-            for li in listing_inv:
+            for li in listing_inv['products']:
                 if li["is_deleted"] == 1:
                     continue
                 prod = {
